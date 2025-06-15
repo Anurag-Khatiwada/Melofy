@@ -14,7 +14,9 @@ declare global {
     interface Request {
       user?: {
         userId: string;
+        token: string;
       };
+
     }
   }
 }
@@ -47,6 +49,7 @@ export const validateToken = (req: Request,res: Response, next: NextFunction): v
         console.log(payload)
         req.user  = {
              userId: payload.user || payload.userId || payload._id || "",
+             token: token
         }
 
         next()

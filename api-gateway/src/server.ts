@@ -44,6 +44,12 @@ interface CustomError extends Error {
   status?: number;
 }
 
+interface ExtendedRequest extends Request {
+  user?: {
+    userId: string;
+    token: string;
+  };
+}
 const proxyOptions = {
   proxyReqPathResolver: (req: Request): string => {
     return req.originalUrl.replace(/^\/v1/, "/api");
@@ -59,10 +65,10 @@ const proxyOptions = {
       service: "api-gateway",
       timestamp: new Date().toString(),
     });
-    res.status(500).json({
-      message: "Internal server error",
-      error: err.message,
-    });
+    // res.status(500).json({
+    //   message: "Internal server error",
+    //   error: err.message,
+    // });
   },
 };
 
@@ -80,15 +86,15 @@ app.use(
   },
   proxy(userServiceUrl, {
     ...proxyOptions,
-    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: Request) => {
+    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: ExtendedRequest) => {
       proxyReqOpts.headers = {
         ...proxyReqOpts.headers,
         "Content-Type": "application/json",
       };
       proxyReqOpts.headers = {
         ...proxyReqOpts.headers,
-        "x-user-id": srcReq.user?.userId || ""
-      }
+        "x-user-id": srcReq.user?.userId || "",
+      };
       return proxyReqOpts;
     },
     userResDecorator: (
@@ -105,8 +111,84 @@ app.use(
   } as any)
 );
 
+//setting proxy for admin services:
+app.use(
+  "/v1/admin",
+  validateToken,
+  proxy(
+    process.env.ADMIN_SERVICE as string,
+    {
+      ...proxyOptions,
+        parseReqBody: false, //  Important: disables body parsing so file stream passes through
+      proxyReqOptDecorator: (proxyReqOpts: any, srcReq: Request) => {
+        proxyReqOpts.headers = {
+          ...proxyReqOpts.headers,
+          "x-user-id": srcReq.user?.userId || "",
+          "x-auth-token": srcReq.user?.token || "",
+        };
+        // if (
+        //   !proxyReqOpts.headers["Content-Type"] ||
+        //   proxyReqOpts.headers["Content-Type"].includes("application/json")
+        // ) {
+        //   proxyReqOpts.headers["Content-Type"] = "application/json";
+        // }
+        return proxyReqOpts;
+      },
+      userResDecorator: (
+        proxyRes: IncomingMessage,
+        proxyResData: Buffer,
+        userReq: Request,
+        userRes: Response
+      ) => {
+        logger.info(
+          `Response received from Admin Service: ${proxyRes.statusCode}`
+        );
+        return proxyResData;
+      },
+    } as any
+  )
+);
+
+//setting proxy for admin services:
+app.use(
+  "/v1/songs",
+  validateToken,
+  proxy(
+    process.env.SONG_SERVICE as string,
+    {
+      ...proxyOptions,
+        parseReqBody: false, //  Important: disables body parsing so file stream passes through
+      proxyReqOptDecorator: (proxyReqOpts: any, srcReq: Request) => {
+        proxyReqOpts.headers = {
+          ...proxyReqOpts.headers,
+          "x-user-id": srcReq.user?.userId || "",
+          "x-auth-token": srcReq.user?.token || "",
+        };
+        // if (
+        //   !proxyReqOpts.headers["Content-Type"] ||
+        //   proxyReqOpts.headers["Content-Type"].includes("application/json")
+        // ) {
+        //   proxyReqOpts.headers["Content-Type"] = "application/json";
+        // }
+        return proxyReqOpts;
+      },
+      userResDecorator: (
+        proxyRes: IncomingMessage,
+        proxyResData: Buffer,
+        userReq: Request,
+        userRes: Response
+      ) => {
+        logger.info(
+          `Response received from song Service: ${proxyRes.statusCode}`
+        );
+        return proxyResData;
+      },
+    } as any
+  )
+);
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  logger.info(`Server is running on port ${PORT}`);
+  logger.info(`Api gateway Server is running on port ${PORT}`);
 });

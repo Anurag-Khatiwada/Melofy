@@ -41,10 +41,10 @@ const proxyOptions = {
             service: "api-gateway",
             timestamp: new Date().toString(),
         });
-        res.status(500).json({
-            message: "Internal server error",
-            error: err.message,
-        });
+        // res.status(500).json({
+        //   message: "Internal server error",
+        //   error: err.message,
+        // });
     },
 };
 // Set up proxy for user service
@@ -64,7 +64,7 @@ app.use("/v1/user", (req, res, next) => {
         };
         proxyReqOpts.headers = {
             ...proxyReqOpts.headers,
-            "x-user-id": srcReq.user?.userId || ""
+            "x-user-id": srcReq.user?.userId || "",
         };
         return proxyReqOpts;
     },
@@ -73,7 +73,53 @@ app.use("/v1/user", (req, res, next) => {
         return proxyResData;
     },
 }));
+//setting proxy for admin services:
+app.use("/v1/admin", validateToken, proxy(process.env.ADMIN_SERVICE, {
+    ...proxyOptions,
+    parseReqBody: false, //  Important: disables body parsing so file stream passes through
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        proxyReqOpts.headers = {
+            ...proxyReqOpts.headers,
+            "x-user-id": srcReq.user?.userId || "",
+            "x-auth-token": srcReq.user?.token || "",
+        };
+        // if (
+        //   !proxyReqOpts.headers["Content-Type"] ||
+        //   proxyReqOpts.headers["Content-Type"].includes("application/json")
+        // ) {
+        //   proxyReqOpts.headers["Content-Type"] = "application/json";
+        // }
+        return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+        logger.info(`Response received from Admin Service: ${proxyRes.statusCode}`);
+        return proxyResData;
+    },
+}));
+//setting proxy for admin services:
+app.use("/v1/songs", validateToken, proxy(process.env.SONG_SERVICE, {
+    ...proxyOptions,
+    parseReqBody: false, //  Important: disables body parsing so file stream passes through
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        proxyReqOpts.headers = {
+            ...proxyReqOpts.headers,
+            "x-user-id": srcReq.user?.userId || "",
+            "x-auth-token": srcReq.user?.token || "",
+        };
+        // if (
+        //   !proxyReqOpts.headers["Content-Type"] ||
+        //   proxyReqOpts.headers["Content-Type"].includes("application/json")
+        // ) {
+        //   proxyReqOpts.headers["Content-Type"] = "application/json";
+        // }
+        return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+        logger.info(`Response received from song Service: ${proxyRes.statusCode}`);
+        return proxyResData;
+    },
+}));
 app.use(errorHandler);
 app.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`);
+    logger.info(`Api gateway Server is running on port ${PORT}`);
 });

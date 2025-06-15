@@ -34,7 +34,7 @@ app.use("/api/user", userRoutes)
 app.use(errorHandler)
 
 app.listen(PORT,()=>{
-    logger.info(`Server is running on port ${PORT}`)
+    logger.info(`User service Server is running on port ${PORT}`)
     connectToDb()
 
 })

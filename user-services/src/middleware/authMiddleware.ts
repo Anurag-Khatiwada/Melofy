@@ -12,7 +12,8 @@ export const isAuth = async(req: AuthencatedRequest, res: Response, next: NextFu
     try{
         
         const userId = req.header('x-user-id') as string;
-        console.log(userId)
+        const token = req.header('token') as string
+
         if(!userId || userId===""){
         logger.warn("Access request without authorization! Please login");
         res.status(403).json({
@@ -31,6 +32,7 @@ export const isAuth = async(req: AuthencatedRequest, res: Response, next: NextFu
 
         return
     }
+    console.log(user)
 
     req.user = user
 

@@ -3,7 +3,7 @@ import { User } from "../model/User.js";
 export const isAuth = async (req, res, next) => {
     try {
         const userId = req.header('x-user-id');
-        console.log(userId);
+        const token = req.header('token');
         if (!userId || userId === "") {
             logger.warn("Access request without authorization! Please login");
             res.status(403).json({
@@ -19,6 +19,7 @@ export const isAuth = async (req, res, next) => {
             });
             return;
         }
+        console.log(user);
         req.user = user;
         next();
     }

@@ -24,6 +24,7 @@ export const validateToken = (req, res, next) => {
         console.log(payload);
         req.user = {
             userId: payload.user || payload.userId || payload._id || "",
+            token: token
         };
         next();
     });
