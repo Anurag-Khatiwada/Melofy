@@ -4,6 +4,7 @@ export const isAuth = async (req, res, next) => {
     try {
         const userId = req.header('x-user-id');
         const token = req.header('token');
+        console.log(userId);
         if (!userId || userId === "") {
             logger.warn("Access request without authorization! Please login");
             res.status(403).json({

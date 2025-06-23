@@ -65,7 +65,7 @@ export const addToAlbum = TryCatch(async (req: AuthenticatedRequest, res) => {
 
   res.status(200).json({
     success: true,
-    messsage: "Album created successfully",
+    message: "Album created successfully",
     album: result[0],
   });
 });

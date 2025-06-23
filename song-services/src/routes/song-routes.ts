@@ -4,10 +4,10 @@ import { getAllAlbums, getAllSongs, getSingleSong, getSongsFromAlbum } from "../
 
 const router = express.Router();
 
-router.get("/all-albums",isAuth,getAllAlbums)
-router.get("/all-songs",isAuth,getAllSongs)
-router.get("/songs-from-album/:id",isAuth,getSongsFromAlbum)
-router.get("/song/:id",isAuth,getSingleSong)
+router.get("/all-albums",getAllAlbums)
+router.get("/all-songs",getAllSongs)
+router.get("/songs-from-album/:id",getSongsFromAlbum)
+router.get("/song/:id",getSingleSong)
 
 
 

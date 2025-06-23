@@ -1,9 +1,11 @@
 import {useNavigate } from "react-router-dom"
 import PlayListCard from "../Playlist/PlayListCard"
+import { useUserData } from "../../context/userContext"
 
 const Sidebar = () => {
 
     const navigate = useNavigate()
+    const {user} = useUserData()
   return (
     <div className="w-[25%] h-full p-2 flex-col gap-2 text-white hidden lg:flex">
       <div className="bg-[#121212] h-[15%] rounded flex flex-col justify-around ">
@@ -36,6 +38,7 @@ const Sidebar = () => {
           <p className="font-light">We'll keep updated on new episodes</p>
           <button className="px-4 py-1.5 bg-white text-black text-[15px rounded-full mt-4">Browse Podcast</button>
         </div>
+          {user&&user.role==="admin"&&<button className=" cursor-pointer px-4 py-1.5 bg-white text-black text-[15px rounded-full mt-4" onClick={()=>navigate(`/admin`)}>Admin Dashbord</button>}       
       </div>
     </div>
   )

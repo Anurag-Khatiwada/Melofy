@@ -1,9 +1,10 @@
 import express from "express";
-import { loginUser, logoutUser, myProfile, registerUser } from "../controller/user-controller.js";
+import { addToPlayList, loginUser, logoutUser, myProfile, registerUser } from "../controller/user-controller.js";
 import { isAuth } from "../middleware/authMiddleware.js";
 const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.get("/my-profile", isAuth, myProfile);
+router.post("/add-to-playlist/:id", isAuth, addToPlayList);
 export default router;

@@ -6,6 +6,8 @@ import cors from "cors";
 import helmet from "helmet";
 import proxy from "express-http-proxy";
 import { IncomingMessage } from "http";
+import { match } from "path-to-regexp";
+
 
 import logger from "./utils/logger.js";
 import errorHandler from "./middleware/error-handler.js";
@@ -73,15 +75,19 @@ const proxyOptions = {
 };
 
 // Set up proxy for user service
+const matchAddToPlaylist = match("/add-to-playlist/:id");
+
 
 app.use(
   "/v1/user",
   (req, res, next) => {
-    // ✅ Conditionally apply validation only to /v1/user/my-profile
-    if (req.method === "GET" && req.path === "/my-profile") {
+    const shouldValidate =
+      req.path === "/my-profile" || matchAddToPlaylist(req.path);
+
+    if (shouldValidate) {
       return validateToken(req, res, next);
     }
-    // Skip validation for all other routes
+
     next();
   },
   proxy(userServiceUrl, {
@@ -149,10 +155,10 @@ app.use(
   )
 );
 
-//setting proxy for admin services:
+//setting proxy for song services:
 app.use(
   "/v1/songs",
-  validateToken,
+  
   proxy(
     process.env.SONG_SERVICE as string,
     {
@@ -161,8 +167,8 @@ app.use(
       proxyReqOptDecorator: (proxyReqOpts: any, srcReq: Request) => {
         proxyReqOpts.headers = {
           ...proxyReqOpts.headers,
-          "x-user-id": srcReq.user?.userId || "",
-          "x-auth-token": srcReq.user?.token || "",
+          // "x-user-id": srcReq.user?.userId || "",
+          // "x-auth-token": srcReq.user?.token || "",
         };
         // if (
         //   !proxyReqOpts.headers["Content-Type"] ||
