@@ -52,10 +52,15 @@ Melofy is structured into distinct services:
 ## 📁 Project Structure
 
 Melofy/
+
 ├── api-gateway/ # Central API router
+
 ├── user-services/ # Auth, profile, playlist
+
 ├── song-services/ # Albums and songs
+
 ├── admin-services/ # Add/delete songs, albums, thumbnails
+
 └── frontend/ # React + Tailwind client UI
 
 
@@ -88,6 +93,9 @@ Melofy/
 | DELETE | `/delete-album/:id` | Delete an album (auth required) |
 | DELETE | `/delete-song/:id` | Delete a song (auth required) |
 
+
+
+
 ---
 
 ## ⚙️ Getting Started
@@ -113,29 +121,7 @@ cd ../frontend && npm install
 # Running each service
 npm run dev
 
-🖼️ Frontend
-The frontend is built with React and Tailwind CSS. It consumes all routes from the API gateway and provides features like:
-
-User registration/login UI
-
-Album/song browsing interface
-
-Playlist management for users
-
-Admin panel for managing content
-
-📬 Contributing
-Contributions are welcome! If you'd like to contribute:
-
-Fork this repo
-
-Create a new branch (git checkout -b feature-xyz)
-
-Commit your changes
-
-Push to the branch
-
-Open a pull request
+```
 
 ![Screenshot 2025-06-25 155544](https://github.com/user-attachments/assets/7d6e6d1b-8c23-4cf9-9af2-3ef5af5b8790)
 ![Screenshot 2025-06-25 155523](https://github.com/user-attachments/assets/27196136-41b9-4eff-bab8-c3c366ba448f)
